@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	original := bytes.Repeat([]byte("The highest function of ecology is the understanding of consequences."), 100)
+	original := bytes.Repeat([]byte("The highest function of ecology is the understanding of consequences."), 92)
 
 	compressed, err := compression.Compress(original)
 	if err != nil {

@@ -16,11 +16,14 @@ func TestRoundTrip(t *testing.T) {
 		{"Long", bytes.Repeat([]byte("The quick brown fox jumps over the lazy dog. "), 100)},
 		{"RepeatedBytes", bytes.Repeat([]byte{0xAA}, 1024)},
 		{"AlternatingBytes", bytes.Repeat([]byte{0xAA, 0x55}, 512)},
-		{"RandomData", func() []byte {
-			data := make([]byte, 1024)
-			rand.Read(data)
-			return data
-		}()},
+		{
+			"RandomData",
+			func() []byte {
+				data := make([]byte, 1024)
+				rand.Read(data)
+				return data
+			}(),
+		},
 		{"MostlyZeros", func() []byte {
 			data := make([]byte, 1024)
 			data[500] = 1
@@ -63,7 +66,7 @@ func TestCompressionRatio(t *testing.T) {
 	}{
 		{"Empty", []byte{}},
 		{"Short", []byte("hello world")},
-		{"Long", bytes.Repeat([]byte("The quick brown fox jumps over the lazy dog. "), 100)},
+		{"Long", bytes.Repeat([]byte("I must not fear. Fear is the mind-killer. Fear is the little-death that brings total obliteration. I will face my fear. I will permit it to pass over me and through me..."), 92)},
 		{"RepeatedBytes", bytes.Repeat([]byte{0xAA}, 1024)},
 		{"AlternatingBytes", bytes.Repeat([]byte{0xAA, 0x55}, 512)},
 		{"RandomData", func() []byte {
@@ -119,7 +122,7 @@ func TestCompressionRatio(t *testing.T) {
 					t.Errorf("Empty: Compression ratio should be 0, got %.2f", ratio)
 				}
 			case "Short":
-				if ratio > 1.2 { // Allow some expansion for very short strings
+				if ratio > 1.2 {
 					t.Errorf("Short: Compression ratio too high: %.2f (expected < 1.2)", ratio)
 				}
 			default:
@@ -136,7 +139,7 @@ func TestSpecialCharacters(t *testing.T) {
 		name string
 		data []byte
 	}{
-		{"UTF8BOM", []byte("\xEF\xBB\xBFHello World")},
+		{"UTF8BOM", []byte("\xEF\xBB\xBFYou cannot go against the nature of a place without strengthening that nature.")},
 		{"Arabic", []byte("الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ")},
 		{"Japanese", []byte("いろはにほへと ちりぬるを")},
 		{"Emoji", []byte("🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐨 🐯 🦁 🐮 🐷 🐸 🐵\n🐔 🐧 🐦 🦆 🦅 🦉 🦇 🐺 🐗 🐴 🦄 🐝 🪱 🐛 🦋\n🐌 🐞 🐜 🪰 🪲 🪳 🦟 🦗 🕷 🦂 🐢 🐍 🦎 🦖\n🦕 🐙 🦑 🦐 🦞 🦀 🐡 🐠 🐟 🐬 🐳 🐋 🦈 🐊 🐅\n🐆 🦓 🦍 🦧 🦣 🐘 🦛 🦏 🐪 🐫 🦒 🦘 🦬 🐃 🐂\n🐄 🐎 🐖 🐏 🐑 🦙 🐐 🦌 🐕 🐩 🦮 🐕🦺 🐈 🐈⬛✨")},
@@ -150,9 +153,9 @@ func TestSpecialCharacters(t *testing.T) {
 				t.Fatalf("Compression failed: %v", err)
 			}
 
-			decompressed, err := Decompress(compressed) // Line 21 (corrected)
+			decompressed, err := Decompress(compressed)
 			if err != nil {
-				t.Fatalf("Decompression failed: %v", err) // Handle potential decompression error
+				t.Fatalf("Decompression failed: %v", err)
 			}
 
 			if !bytes.Equal(tt.data, decompressed) {
